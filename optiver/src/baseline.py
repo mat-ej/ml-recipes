@@ -107,6 +107,7 @@ def past_realized_volatility_per_stock(list_file,prediction_column_name):
 
 df_past_realized_train = past_realized_volatility_per_stock(list_file=list_order_book_file_train,
                                                            prediction_column_name='pred')
+print("break")
 
 # %%
 train['row_id'] = train['stock_id'].astype(str) + '-' + train['time_id'].astype(str)
