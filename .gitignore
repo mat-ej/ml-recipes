@@ -5,8 +5,8 @@ __pycache__/
 
 .idea
 optiver/data/optiver-realized-volatility-prediction
-
-# C extensions
+optiver/optiver-realized-volatility-prediction.zip
+# C extension optiver-realized-volatility-prediction.zips
 *.so
 
 # Distribution / packaging
