@@ -40,28 +40,25 @@ print(train.head())
 
 # %%
 # first ten stocks
-# book_filenames = os.listdir(book_filepath)
-# trade_filenames = os.listdir(trade_filepath)
-# print(book_filenames[:10])
-# print(trade_filenames[:10])
-#
-# sample = pd.read_parquet(os.path.join(book_filepath, book_filenames[0]))
-# wap1 = calc_wap1(sample)
-# log_returns = calc_log_return(wap1)
-# realized_vol = get_realized_volatility(log_returns)
-#
-# book_df = get_book_data(0)
-# trade_df = get_trade_data(0)
-# print(trade_df)
-#
+book_filenames = os.listdir(book_filepath)
+trade_filenames = os.listdir(trade_filepath)
+print(book_filenames[:10])
+print(trade_filenames[:10])
+
+sample = pd.read_parquet(os.path.join(book_filepath, book_filenames[0]))
+wap1 = calc_wap1(sample)
+log_returns = calc_log_return(wap1)
+realized_vol = realized_volatility(log_returns)
+
+book_df = get_book_data(0)
+trade_df = get_trade_data(0)
+print(trade_df)
 
 
-# %%
 book_all = pd.read_parquet(f'{data_path}/book_train.parquet/stock_id=0')
 trade_all = pd.read_parquet(f'{data_path}/trade_train.parquet/stock_id=0')
 
-# %%
-# select two random stocks to compare
+
 stock_id1 = 0
 stock_id2 = 43
 
@@ -97,26 +94,15 @@ sns.scatterplot(data = book0t5, x = 'seconds_in_bucket', y = 'wap1',
 sns.lineplot(data = book0t5, y = 'wap1', x='seconds_in_bucket', label = 'wap1')
 plt.show()
 
-stock0_time5 = realized_volatility(book0t5.log_return1)
-
-book0t5[['log_return1', 'seconds_in_bucket']]
-
-# print()
-
-#%%
-# df = make_features(train)
-
-
-
-trade0 = make_trade_features(0, flatten_cols=True)
-book0 = make_book_features(0, flatten_cols = True)
+trade0 = make_trade_features(0)
+book0 = make_book_features(0)
 
 fig = plt.figure(figsize=(8,5))
-sns.lineplot(data=book0, y='wap1|median', x='time_id')
+sns.lineplot(data=book0, y='wap1|mean', x='time_id')
 plt.show()
 
 fig = plt.figure(figsize=(8,5))
 sns.lineplot(data=trade0, y='price|mean', x='time_id')
 plt.show()
-# plt.show(book0[columns])
-book0
+
+# %%

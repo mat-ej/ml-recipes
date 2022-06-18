@@ -47,16 +47,24 @@ def log_return(series_wap):
 def realized_volatility(series_log_return):
     return np.sqrt(np.sum(series_log_return**2))
 
-def flatten_columns(column_tuple: tuple) -> tuple:
+def flatten_columns(column_tuple: tuple, split_char = '|') -> tuple:
     #e.g. column_tuple = ('wap1', 'sum')
     if (column_tuple[1] == ''):
         return column_tuple[0]
-    return '{0[0]}|{0[1]}'.format(column_tuple)
+
+    template = '{0[0]}' + split_char +'{0[1]}'
+    return template.format(column_tuple)
 
 
 def flatten_columns_df(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = df.columns.map(flatten_columns)
     return df
+
+def get_train_test_targets():
+    train = pd.read_csv(f'{data_path}/train.csv')
+    test = pd.read_csv(f'{data_path}/test.csv')
+
+    return train, test
 
 def get_book_data(stock_id):
     df = pd.read_parquet(os.path.join(book_filepath, f'stock_id={stock_id}'))
@@ -73,28 +81,49 @@ def get_book_data(stock_id):
     df = df[~(df.log_return1.isnull() | df.log_return2.isnull())]
     return df
 
-def make_trade_features(stock_id: int, flatten_cols = True):
+def make_trade_features(stock_id: int):
     trade = pd.read_parquet(os.path.join(trade_filepath, f'stock_id={stock_id}'))
-    trade['log_return'] = trade.groupby(['time_id']).price.apply(log_return)
+    trade['log_return'] = trade.groupby(['time_id'])['price'].apply(log_return)
     trade['size_per_order'] = trade['size'] / trade['order_count']
 
     features = {
-        'log_return' : [np.sum, np.mean, np.median, np.std, realized_volatility],
+        'log_return' : [np.sum, np.mean, np.std, realized_volatility],
         'size': [np.sum, np.mean, np.max],
         'size_per_order': [np.max],
         'price': [np.mean]
     }
 
-    trade_features = trade.groupby(['time_id']).agg(features).reset_index(drop = False)
-    trade_features['stock_id'] = stock_id
+    def get_features_window(feature_dict, seconds_in_bucket_from, add_suffix=False):
+        features_w = trade[trade['seconds_in_bucket'] >= seconds_in_bucket_from].groupby('time_id').agg(feature_dict)\
+            .reset_index()
 
-    assert len(trade_features) == len(set(trade_features.time_id)), "Error: trade_features timestep lost after aggregation"
-    if flatten_cols:
-        trade_features.columns = trade_features.columns.map(flatten_columns)
+        features_w = flatten_columns_df(features_w)
 
-    return trade_features
+        if add_suffix:
+            features_w = features_w.add_suffix(f'|{seconds_in_bucket_from}')
+            features_w.rename(columns={f'time_id|{seconds_in_bucket_from}':'time_id'}, inplace=True)
 
-def make_book_features(stock_id: int, flatten_cols=True):
+        return features_w
+
+    trade0 = get_features_window(features, 0, add_suffix=False)
+    trade100 = get_features_window(features, 100, add_suffix=True)
+    trade200 = get_features_window(features, 200, add_suffix=True)
+    trade300 = get_features_window(features, 300, add_suffix=True)
+    trade400 = get_features_window(features, 400, add_suffix=True)
+    trade500 = get_features_window(features, 500, add_suffix=True)
+
+    trade = trade0.merge(trade100, on='time_id', how='inner')
+    trade = trade.merge(trade200, on='time_id', how='inner')
+    trade = trade.merge(trade300, on='time_id', how='inner')
+    trade = trade.merge(trade400, on='time_id', how='inner')
+    trade = trade.merge(trade500, on='time_id', how='inner')
+
+    trade['stock_id'] = stock_id
+
+    assert len(trade) == len(set(trade.time_id)), "Error: trade_features timestep lost after aggregation"
+    return trade
+
+def make_book_features(stock_id: int):
     book = pd.read_parquet(os.path.join(book_filepath, f'stock_id={stock_id}'))
     book['wap1'] = calc_wap1(book)
     book['wap2'] = calc_wap2(book)
@@ -120,24 +149,20 @@ def make_book_features(stock_id: int, flatten_cols=True):
     book['volume_imbalance'] = abs((book['ask_size1'] + book['ask_size2']) - (book['bid_size1'] + book['bid_size2']))
 
     features = {
-        'netsize1': [np.sum, np.mean, np.median, np.std],
-        'my_spread': [np.sum, np.mean, np.median, np.std],
-        'price_spread': [np.sum, np.mean, np.median, np.std],
-
-        'wap1': [np.sum, np.mean, np.median, np.std],
-        'total_volume' : [np.sum, np.mean, np.median, np.std],
-        'volume_imbalance' : [np.sum, np.mean, np.median, np.std],
-        'log_return1' : [np.sum, np.mean, np.median, np.std, realized_volatility]
+        'netsize1': [np.sum, np.mean, np.std],
+        'my_spread': [np.sum, np.mean, np.std],
+        'price_spread': [np.sum, np.mean, np.std],
+        'wap1': [np.sum, np.mean, np.std],
+        'total_volume' : [np.sum, np.mean, np.std],
+        'volume_imbalance' : [np.sum, np.mean, np.std],
+        'log_return1' : [np.sum, np.mean, np.std, realized_volatility]
     }
 
     book_features = book.groupby(['time_id']).agg(features).reset_index(drop=False)
     book_features['stock_id'] = stock_id
+    book_features.columns = book_features.columns.map(flatten_columns)
 
     assert len(book_features) == len(set(book.time_id)), "Error: book_features timestep lost after aggregation"
-
-    if flatten_cols:
-        book_features.columns = book_features.columns.map(flatten_columns)
-
     return book_features
 
 def get_trade_data(stock_id):
@@ -157,9 +182,14 @@ def timer(name: str):
     elapsed = time.time() - s
     print(f'[{name}] {elapsed: .3f}sec')
 
-def make_features(base, stock_range=range(0,6)):
+def make_features(base, stock_range=range(0,5)):
     # stock_ids = set(base['stock_id'])
-    stock_ids = set(stock_range)
+    if stock_range:
+        stock_ids = set(stock_range)
+    else:
+        stock_ids = set(base['stock_id'])
+
+    print(f'generating features for {len(stock_ids)} stocks')
     base = base[base['stock_id'].isin(stock_ids)]
     with timer('books'):
         books = Parallel(n_jobs=-1)(delayed(make_book_features)(i) for i in stock_ids)
@@ -170,8 +200,8 @@ def make_features(base, stock_range=range(0,6)):
         trade = pd.concat(trades)
 
     with timer('extra features'):
-        df = pd.merge(base, book, on=['stock_id', 'time_id'], how='left')
-        df = pd.merge(df, trade, on=['stock_id', 'time_id'], how='left')
+        df = pd.merge(base, book, on=['stock_id', 'time_id'], how='inner')
+        df = pd.merge(df, trade, on=['stock_id', 'time_id'], how='inner')
         #df = make_extra_features(df)
 
     return df

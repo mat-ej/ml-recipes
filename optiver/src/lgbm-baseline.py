@@ -408,13 +408,15 @@ for n in range(7):
     l.append ( [ (x-1) for x in ( (ids+1)*(kmeans.labels_ == n)) if x > 0] )
     
 
+
+# what is the mean volatility within the cluster on every timestep?
 mat = []
 matTest = []
 
 n = 0
 for ind in l:
     print(ind)
-    newDf = train.loc[train['stock_id'].isin(ind) ]
+    newDf = train.loc[train['stock_id'].isin(ind)]
     newDf = newDf.groupby(['time_id']).agg(np.nanmean)
     newDf.loc[:,'stock_id'] = str(n)+'c1'
     mat.append ( newDf )
