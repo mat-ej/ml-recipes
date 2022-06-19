@@ -68,9 +68,8 @@ train = train[train.columns[~train.columns.isin(non_feature_cols)]]
 
 seed0=2021
 params0 = {
-    # 'objective': custom_asymmetric_train, #NOTE if not included, feval is used in the optimization process:
+    'objective': 'rmse',
     'boosting_type': 'gbdt', #DART is GBDT with dropout, slower convergence. gbdt,dart,goss,rf- random for
-    # 'boosting_type': 'goss', # cannot use bagging
     # 'metric': 'l1', #VAL LOSS
     'max_depth': -1,
     'max_bin':100,
@@ -88,7 +87,8 @@ params0 = {
     'drop_seed': seed0,
     'data_random_seed': seed0,
     'n_jobs':-1,
-    'verbose': -1}
+    'verbose': -1
+}
 
 
 gbm = lightgbm.LGBMRegressor(random_state=33)
@@ -106,7 +106,7 @@ for fold, (trn_ind, val_ind) in enumerate(kfold.split(train)):
     y_train, y_val = y.iloc[trn_ind], y.iloc[val_ind]
 
     # Root mean squared percentage error weights
-    train_weights = 1 / np.square(y_train)
+    train_weights = 1 / np.square(y_train) #CREATES RMSPE out of RMSE
     val_weights = 1 / np.square(y_val)
 
     train_dataset = lgb.Dataset(X_train, y_train, weight=train_weights)
