@@ -1,6 +1,9 @@
+### LGBM SKLEARN API
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import torch
 from lightgbm import LGBMRegressor
 import lightgbm
 from sklearn.datasets import make_friedman2, make_friedman1, make_regression
@@ -46,8 +49,38 @@ def custom_asymmetric_objective(y_true, y_pred):
 
 def custom_asymmetric_eval(y_true, y_pred):
     residual = (y_true - y_pred).astype("float")
-    loss = np.where(residual < 0, (residual**2)*10.0, residual**2)
-    return "custom_asymmetric_eval", np.mean(loss), False
+    losses = np.where(residual < 0, (residual**2)*10.0, residual**2)
+    return "custom_asymmetric_eval", np.mean(losses), False
+
+# TORCH assymteric loss autodiff
+
+def torch_assymetric_loss(y_true: torch.Tensor, y_pred: torch.Tensor):
+    """Calculate the Squared Log Error loss."""
+    residual = (y_true - y_pred)
+    losses = torch.where(residual < 0, 10.0 * torch.pow(residual, 2), torch.pow(residual, 2))
+    return losses
+
+def torch_autodiff_grad_hess(loss_function, y_true: np.ndarray, y_pred: np.ndarray
+):
+    """Perform automatic differentiation to get the
+    Gradient and the Hessian of `loss_function`."""
+    y_true = torch.tensor(y_true, dtype=torch.float, requires_grad=False)
+    y_pred = torch.tensor(y_pred, dtype=torch.float, requires_grad=True)
+    loss_function_mean = lambda y_pred: torch.mean(loss_function(y_true, y_pred))
+    loss_function_mean(y_pred).backward()
+    grad = y_pred.grad
+    hess_matrix = torch.autograd.functional.hessian(loss_function_mean, y_pred, vectorize=True)
+    hess = torch.diagonal(hess_matrix)
+
+    return grad, hess
+
+def custom_asymmetric_objective_torch(y_true, y_pred):
+    grad, hess = torch_autodiff_grad_hess(torch_assymetric_loss, y_true, y_pred)
+    grad_np= grad.detach().numpy()
+    hess_np = hess.detach().numpy()
+    # np.ascontiguousarray(hess_np)
+    return np.ascontiguousarray(grad_np), np.ascontiguousarray(hess_np)
+
 
 
 # %%
@@ -117,7 +150,10 @@ plt.show()
 
 # %%
 # CUSTOM LOSS grad, hess
+_, loss, _ = custom_asymmetric_eval(y_true, y_pred)
 grad, hess = custom_asymmetric_objective(y_true, y_pred)
+grad2, hess2 = custom_asymmetric_objective_torch(y_true, y_pred)
+
 
 fig, ax = plt.subplots(1,1, figsize=(8,4))
 
@@ -130,6 +166,21 @@ ax.set_ylabel('first or second derivates')
 
 fig.tight_layout()
 plt.show()
+# %% GBM custom objective TORCH
+gbm_torch = lightgbm.LGBMRegressor(random_state=33,
+                              early_stopping_rounds = 10,
+                              n_estimators=10000)
+gbm_torch.set_params(**{'objective': custom_asymmetric_objective_torch}, metrics = ["mse", 'mae'])
+
+gbm_torch.fit(
+    X_train,
+    y_train,
+    eval_set=[(X_valid, y_valid)],
+    eval_metric=custom_asymmetric_eval,
+    verbose=True,
+)
+
+
 
 # %% GBM custom objective
 gbm3 = lightgbm.LGBMRegressor(random_state=33)
@@ -200,6 +251,7 @@ _,loss_gbm3,_ = custom_asymmetric_eval(y_test, gbm3.predict(X_test))
 _,loss_gbm4,_ = custom_asymmetric_eval(y_test, gbm4.predict(X_test))
 _,loss_gbm5,_ = custom_asymmetric_eval(y_test, gbm5.predict(X_test))
 _,loss_gbm6,_ = custom_asymmetric_eval(y_test, gbm6.predict(X_test))
+_,loss_gbm_torch,_ = custom_asymmetric_eval(y_test, gbm_torch.predict(X_test))
 
 score_dict = {'Random Forest default':
                   {'asymmetric custom mse (test)': loss_rf,
@@ -241,10 +293,16 @@ score_dict = {'Random Forest default':
                   {'asymmetric custom mse (test)': loss_gbm6,
                    'asymmetric custom mse (train)': custom_asymmetric_eval(y_train, gbm6.predict(X_train))[1],
                    'symmetric mse': mean_squared_error(y_test, gbm6.predict(X_test)),
-                   '# boosting rounds': gbm6.booster_.current_iteration()}
+                   '# boosting rounds': gbm6.booster_.current_iteration()},
+
+            'Torch autograd + LightGBM with early_stopping, custom training and custom validation loss':
+                  {'asymmetric custom mse (test)': loss_gbm_torch,
+                   'asymmetric custom mse (train)': custom_asymmetric_eval(y_train, gbm_torch.predict(X_train))[1],
+                   'symmetric mse': mean_squared_error(y_test, gbm_torch.predict(X_test)),
+                   '# boosting rounds': gbm_torch.booster_.current_iteration()}
 
               }
-
+score_df = pd.DataFrame(score_dict).T
 print(pd.DataFrame(score_dict).T)
 print()
 
@@ -252,8 +310,8 @@ print()
 fig, ax = plt.subplots(figsize=(12,6))
 ax = sns.distplot(y_test - gbm.predict(X_test), hist = False, kde = True,
              kde_kws = {'shade': True, 'linewidth': 3}, axlabel="Residual", label = "LightGBM with default mse")
-ax = sns.distplot(y_test - gbm3.predict(X_test), hist = False, kde = True,
-             kde_kws = {'shade': True, 'linewidth': 3}, axlabel="Residual", label = "LightGBM with asymmetric mse")
+ax = sns.distplot(y_test - gbm_torch.predict(X_test), hist = False, kde = True,
+             kde_kws = {'shade': True, 'linewidth': 3}, axlabel="Residual", label = "Torch + LightGBM with asymmetric mse")
 
 # control x and y limits
 ax.set_xlim(-3, 3)
@@ -286,8 +344,8 @@ fig.tight_layout()
 plt.show()
 
 # %% ERROR histograms of residuals y_true - y_pred
-fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(12,5))
-ax1, ax2, ax3 = ax.flatten()
+fig, ax = plt.subplots(nrows=1, ncols=4, figsize=(16,5))
+ax1, ax2, ax3, ax4 = ax.flatten()
 
 ax1.hist(y_test - rf.predict(X_test), bins=50, color='#1c9099')
 ax1.axvline(x=0, ymin=0, ymax=500, color='black', lw=1.2)
@@ -306,6 +364,12 @@ ax3.axvline(x=0, ymin=0, ymax=500, color='black', lw=1.2)
 ax3.set_xlabel('Residuals')
 ax3.set_ylabel('# observations')
 ax3.set_title('LightGBM with early_stopping, \n custom objective and custom evalution')
+
+ax4.hist(y_test - gbm_torch.predict(X_test), bins=50,  color='#1c9099')
+ax4.axvline(x=0, ymin=0, ymax=500, color='black', lw=1.2)
+ax4.set_xlabel('Residuals')
+ax4.set_ylabel('# observations')
+ax4.set_title('Torch + LightGBM with early_stopping, \n custom objective and custom evalution')
 
 fig.suptitle("Error histograms of predictions from different models", y = 1.05, fontsize=15)
 fig.tight_layout()
