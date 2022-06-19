@@ -3,7 +3,6 @@
 
 # In[1]:
 
-
 from IPython.core.display import display, HTML
 
 import pandas as pd
@@ -23,7 +22,7 @@ from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt 
 import seaborn as sns
 import numpy.matlib
-
+from optiver.src.paths import *
 
 path_submissions = '/'
 
@@ -31,11 +30,12 @@ target_name = 'target'
 scores_folds = {}
 
 
+
 # In[5]:
 
 
 # data directory
-data_dir = '../data/optiver-realized-volatility-prediction/'
+data_dir = f'{data_path}/'
 
 # Function to calculate first WAP
 def calc_wap1(df):
@@ -70,8 +70,8 @@ def count_unique(series):
 
 # Function to read our base train and test set
 def read_train_test():
-    train = pd.read_csv('../input/optiver-realized-volatility-prediction/train.csv')
-    test = pd.read_csv('../input/optiver-realized-volatility-prediction/test.csv')
+    train = pd.read_csv(f'{data_path}/train.csv')
+    test = pd.read_csv(f'{data_path}/test.csv')
     # Create a key to merge with book and trade data
     train['row_id'] = train['stock_id'].astype(str) + '-' + train['time_id'].astype(str)
     test['row_id'] = test['stock_id'].astype(str) + '-' + test['time_id'].astype(str)
@@ -312,26 +312,25 @@ def feval_rmspe(y_pred, lgb_train):
     return 'RMSPE', rmspe(y_true, y_pred), False
 
 
-# In[6]:
-
-
-get_ipython().system('pwd')
-
-
 # In[3]:
 
 
 # Read train and test
 train, test = read_train_test()
 
+# %%
+
 # Get unique stock ids 
 train_stock_ids = train['stock_id'].unique()
+# train_stock_ids = set(range(1,10))
+
 # Preprocess them using Parallel and our single stock id functions
 train_ = preprocessor(train_stock_ids, is_train = True)
 train = train.merge(train_, on = ['row_id'], how = 'left')
 
 # Get unique stock ids 
 test_stock_ids = test['stock_id'].unique()
+# test_stock_ids = set(range(1,10))
 # Preprocess them using Parallel and our single stock id functions
 test_ = preprocessor(test_stock_ids, is_train = False)
 test = test.merge(test_, on = ['row_id'], how = 'left')
@@ -394,7 +393,7 @@ len(colNames)
 from sklearn.cluster import KMeans
 # making agg features
 
-train_p = pd.read_csv('../input/optiver-realized-volatility-prediction/train.csv')
+train_p = pd.read_csv(f'{data_path}/train.csv')
 train_p = train_p.pivot(index='time_id', columns='stock_id', values='target')
 
 corr = train_p.corr()
@@ -409,13 +408,15 @@ for n in range(7):
     l.append ( [ (x-1) for x in ( (ids+1)*(kmeans.labels_ == n)) if x > 0] )
     
 
+
+# what is the mean volatility within the cluster on every timestep?
 mat = []
 matTest = []
 
 n = 0
 for ind in l:
     print(ind)
-    newDf = train.loc[train['stock_id'].isin(ind) ]
+    newDf = train.loc[train['stock_id'].isin(ind)]
     newDf = newDf.groupby(['time_id']).agg(np.nanmean)
     newDf.loc[:,'stock_id'] = str(n)+'c1'
     mat.append ( newDf )
@@ -648,7 +649,7 @@ plateau = tf.keras.callbacks.ReduceLROnPlateau(
 
 # kfold based on the knn++ algorithm
 
-out_train = pd.read_csv('../input/optiver-realized-volatility-prediction/train.csv')
+out_train = pd.read_csv(f'{data_path}/train.csv')
 out_train = out_train.pivot(index='time_id', columns='stock_id', values='target')
 
 #out_train[out_train.isna().any(axis=1)]
@@ -760,7 +761,7 @@ test_nn[['stock_id','time_id']]=test[['stock_id','time_id']]
 
 # making agg features
 from sklearn.cluster import KMeans
-train_p = pd.read_csv('../input/optiver-realized-volatility-prediction/train.csv')
+train_p = pd.read_csv(f'{data_path}/train.csv')
 train_p = train_p.pivot(index='time_id', columns='stock_id', values='target')
 
 corr = train_p.corr()
