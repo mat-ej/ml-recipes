@@ -3,6 +3,8 @@ channels:
   - pytorch
   - pyg
   - plotly
+  - gpytorch
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1
@@ -27,17 +29,20 @@ dependencies:
   - bzip2=1.0.8
   - c-ares=1.18.1
   - ca-certificates=2022.4.26
-  - certifi=2022.5.18.1
+  - certifi=2022.6.15
   - cffi=1.15.0
   - charset-normalizer=2.0.4
   - cryptography=37.0.1
   - cudatoolkit=11.3.1
+  - cvxpy=1.2.1
+  - cvxpy-base=1.2.1
   - cycler=0.11.0
   - dbus=1.13.18
   - debugpy=1.5.1
   - decorator=5.1.1
   - defusedxml=0.7.1
   - double-conversion=3.1.5
+  - ecos=2.0.7.post1
   - entrypoints=0.4
   - executing=0.8.3
   - expat=2.4.4
@@ -51,7 +56,9 @@ dependencies:
   - glib=2.69.1
   - glog=0.5.0
   - gmp=6.2.1
+  - gmpy2=2.1.2
   - gnutls=3.6.15
+  - gpytorch=1.6.0
   - grpc-cpp=1.26.0
   - gst-plugins-base=1.14.0
   - gstreamer=1.14.0
@@ -78,6 +85,7 @@ dependencies:
   - lame=3.100
   - lcms2=2.12
   - ld_impl_linux-64=2.38
+  - libblas=3.9.0
   - libboost=1.73.0
   - libcurl=7.82.0
   - libedit=3.1.20210910
@@ -89,6 +97,7 @@ dependencies:
   - libgfortran4=7.5.0
   - libgomp=11.2.0
   - libidn2=2.3.2
+  - liblapack=3.9.0
   - libllvm11=11.1.0
   - libnghttp2=1.46.0
   - libopus=1.3.1
@@ -120,6 +129,9 @@ dependencies:
   - mkl-service=2.4.0
   - mkl_fft=1.3.1
   - mkl_random=1.2.2
+  - mpc=1.1.0
+  - mpfr=4.0.2
+  - mpmath=1.2.1
   - munkres=1.1.4
   - nbclient=0.5.13
   - nbconvert=6.4.4
@@ -136,10 +148,12 @@ dependencies:
   - openh264=2.1.1
   - openssl=1.1.1o
   - orc=1.6.7
+  - osqp=0.6.2.post0
   - packaging=21.3
   - pandas=1.4.2
   - pandocfilters=1.5.0
   - parso=0.8.3
+  - patsy=0.5.2
   - pcre=8.45
   - pexpect=4.8.0
   - pickleshare=0.7.5
@@ -164,6 +178,7 @@ dependencies:
   - python-dateutil=2.8.2
   - python-fastjsonschema=2.15.1
   - python-louvain=0.15
+  - python_abi=3.9
   - pytorch=1.11.0
   - pytorch-cluster=1.6.0
   - pytorch-mutex=1.0
@@ -173,6 +188,7 @@ dependencies:
   - pytz=2022.1
   - pyyaml=6.0
   - pyzmq=22.3.0
+  - qdldl-python=0.1.5
   - qt=5.9.7
   - qtconsole=5.3.0
   - qtpy=2.0.1
@@ -181,6 +197,7 @@ dependencies:
   - requests=2.27.1
   - scikit-learn=1.0.2
   - scipy=1.7.3
+  - scs=3.2.0
   - seaborn=0.11.2
   - send2trash=1.8.0
   - setuptools=61.2.0
@@ -190,10 +207,12 @@ dependencies:
   - soupsieve=2.3.1
   - sqlite=3.38.3
   - stack_data=0.2.0
+  - statsmodels=0.13.2
+  - sympy=1.10.1
   - tbb=2021.5.0
   - tenacity=8.0.1
   - terminado=0.13.1
-  - testpath=0.5.0
+  - testpath=0.6.0
   - threadpoolctl=2.2.0
   - thrift=0.11.0
   - tk=8.6.12
@@ -220,5 +239,42 @@ dependencies:
   - zlib=1.2.12
   - zstd=1.4.9
   - pip:
+    - astunparse==1.6.3
+    - cachetools==5.2.0
+    - convertdate==2.4.0
+    - flatbuffers==1.12
+    - gast==0.4.0
+    - google-auth==2.8.0
+    - google-auth-oauthlib==0.4.6
+    - google-pasta==0.2.0
+    - grpcio==1.46.3
+    - h5py==3.7.0
+    - hijri-converter==2.2.4
+    - holidays==0.14.2
+    - importlib-metadata==4.11.4
+    - jaxlib==0.3.10
+    - kaleido==0.2.1
+    - keras==2.9.0
+    - keras-preprocessing==1.1.2
+    - korean-lunar-calendar==0.2.1
+    - libclang==14.0.1
+    - markdown==3.3.7
+    - oauthlib==3.2.0
+    - protobuf==3.19.4
+    - pyasn1==0.4.8
+    - pyasn1-modules==0.2.8
+    - pymeeus==0.5.11
     - pytorch-tabnet==3.1.1
+    - requests-oauthlib==1.3.1
+    - rsa==4.8
+    - tensorboard==2.9.1
+    - tensorboard-data-server==0.6.1
+    - tensorboard-plugin-wit==1.8.1
+    - tensorflow==2.9.1
+    - tensorflow-estimator==2.9.0
+    - tensorflow-io-gcs-filesystem==0.26.0
+    - termcolor==1.1.0
+    - werkzeug==2.1.2
+    - wrapt==1.14.1
+    - zipp==3.8.0
 prefix: /home/m/miniconda3/envs/ml-recipes

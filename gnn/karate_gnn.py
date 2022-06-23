@@ -113,7 +113,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # Define optimizer.
 # single run over dataset
 def train(data):
     optimizer.zero_grad()
-    out, h = model(data.x, data.edge_index)
+    out, h = model(data.X, data.edge_index)
 
     # We compute embeddings for all of our nodes for all of our nodes, we only make use of the training nodes for computing the loss.
     # this is implemented by filtering the output of the classifier out and ground-truth labels data.y to only contain the nodes in the train_mask.

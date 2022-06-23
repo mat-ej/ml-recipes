@@ -1,6 +1,7 @@
+# import jax
+# import jax.numpy as jnp
 import torch
 from lightgbm import LGBMRegressor
-
 from optiver.src.paths import *
 from optiver.src.preprocessing import *
 
@@ -8,6 +9,7 @@ from sklearn.model_selection import KFold, train_test_split
 import lightgbm as lgb
 
 #TODO RMSPE == to 1/sqrt(y)  weighting creates RMSPE from RMSE
+
 
 def grad_hess_assymetric_train(y_true, y_pred):
     resid = (y_true - y_pred).astype(float)
@@ -37,10 +39,56 @@ def custom_assymetric_valid(y_true, lgb_dataset_train):
 def rmspe(y_true, y_pred):
     return np.sqrt(np.mean(np.square((y_true - y_pred) / y_true)))
 
+'''
+jax autodiff custom rmspe loss
+'''
+# def jax_rmspe_loss(y_true: np.ndarray, y_pred: np.ndarray):
+#     """Calculate the Squared Log Error loss."""
+#     errors = jnp.square((y_true - y_pred) / y_true)
+#     loss = jnp.sqrt(jnp.mean(errors))
+#     return loss
+#
+# def hvp(f, inputs, vectors):
+#     """Hessian-vector product."""
+#     return jax.jvp(jax.grad(f), inputs, vectors)[1]
+#
+# def jax_autodiff_grad_hess(
+#     loss_function,
+#     y_true: np.ndarray, y_pred: np.ndarray
+# ):
+#     """Perform automatic differentiation to get the
+#     Gradient and the Hessian of `loss_function`."""
+#     loss_function_lambda = lambda y_pred: loss_function(y_true, y_pred)
+#
+#     grad_fn = jax.grad(loss_function_lambda)
+#     grad = grad_fn(y_pred)
+#
+#     '''
+#     Note that we use the hvp (Hessian-vector product)
+#     function (on a vector of ones) from JAX’s Autodiff Cookbook to calculate the diagonal of the Hessian.
+#     This trick is possible only when the Hessian is diagonal (all non-diagonal entries are zero), which holds in our case.
+#     This way, we never store the entire hessian, and calculate it on the fly, reducing memory consumption.
+#     #NOTE does not hold in RMSPE case.
+#     '''
+#
+#     hess = hvp(loss_function_lambda, (y_pred,), (jnp.ones_like(y_pred), ))
+#
+#     return grad, hess
+#
+# def custom_objective_jax(y_true, y_pred):
+#     grad, hess = jax_autodiff_grad_hess(jax_rmspe_loss, y_true, y_pred)
+#     # grad_np = grad.detach().numpy()
+#     # hess_np = hess.detach().numpy()
+#     return np.array(grad), np.array(hess)
+
+
+'''
+torch autodiff custom rmspe loss
+'''
 def torch_rmspe_loss(y_true: torch.Tensor, y_pred: torch.Tensor):
     """Calculate the Squared Log Error loss."""
     errors = torch.square((y_true - y_pred) / y_true)
-    loss = torch.sqrt(torch.mean(errors))
+    # loss = torch.sqrt(torch.mean(errors))
     # losses = torch.where(residual < 0, 10.0 * torch.pow(residual, 2), torch.pow(residual, 2))
     return errors
 
@@ -59,13 +107,14 @@ def torch_autodiff_grad_hess(loss_function, y_true: np.ndarray, y_pred: np.ndarr
 
     return grad, hess
 
-def custom_asymmetric_objective_torch(y_true, y_pred):
+def custom_objective_torch(y_true, y_pred):
     # some weird error
     grad, hess = torch_autodiff_grad_hess(torch_rmspe_loss, y_true, y_pred)
     grad_np= grad.detach().numpy()
     hess_np = hess.detach().numpy()
     # np.ascontiguousarray(hess_np)
-    return grad_np, hess_np
+    return np.ascontiguousarray(grad_np), np.ascontiguousarray(hess_np)
+    # return grad_np, hess_np
 
 def feval_rmspe(y_true, lgb_dataset_train):
      # Each evaluation function should accept two parameters: preds, train_data,
@@ -100,7 +149,7 @@ train = train[train.columns[~train.columns.isin(non_feature_cols)]]
 
 seed0=2021
 params0 = {
-    # 'objective': custom_asymmetric_train, #NOTE if not included, feval is used in the optimization process:
+    'objective': 'rmse', #NOTE if not included, feval is used in the optimization process:
     'boosting_type': 'gbdt', #DART is GBDT with dropout, slower convergence. gbdt,dart,goss,rf- random for
     # 'boosting_type': 'goss', # cannot use bagging
     # 'metric': 'l1', #VAL LOSS
@@ -160,10 +209,11 @@ for fold, (trn_ind, val_ind) in enumerate(kfold.split(train)):
     gbm = LGBMRegressor(objective='regression',
                           random_state=33,
                           early_stopping_rounds=10,
-                          n_estimators=10000
+                          n_estimators=1000
                         )
 
-    gbm.set_params(**{'objective': custom_asymmetric_objective_torch}, metrics=["mse", 'mae'])
+    # gbm.set_params(**{'objective': custom_objective_torch}, metrics=["mse"])
+    gbm.set_params(**{'objective': 'rmse'}, metrics=["mse", 'mae'])
 
     gbm.fit(
         X_train,
