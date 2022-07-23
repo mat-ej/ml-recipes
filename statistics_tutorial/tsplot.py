@@ -4,7 +4,7 @@ import matplotlib.pylab as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 
-def tsplot(y, lags=15):
+def tsplot(y, lags=15, plot_title="Time series"):
     if not isinstance(y, pd.Series):
         y = pd.Series(y)
 
@@ -17,8 +17,10 @@ def tsplot(y, lags=15):
 
     # ts plot
     y.plot(ax=ts_ax)
-    ts_ax.set_title('Time series')
+    ts_ax.set_title(plot_title)
 
     # acf, pacf
     plot_acf(y, lags=lags, ax=acf_ax, alpha=0.5)
     plot_pacf(y, lags=lags, ax=pacf_ax, alpha=0.5)
+
+    plt.show()
