@@ -178,4 +178,3 @@ plt.show()
 
 # %%
 res.diagnostic_summary()
-
