@@ -1,5 +1,9 @@
 from statsmodels.discrete.conditional_models import ConditionalLogit
 import numpy as np
+'''
+CLOGIT - logit with the condition that probabilities in a race sum up to 1
+'''
+
 
 # %%
 '''
