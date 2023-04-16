@@ -1,5 +1,6 @@
 # %%
 import pandas as pd
+import numpy as np
 
 # creating and initializing a list
 values = [['Rohan', 455], ['Elvish', 250], ['Deepak', 495],
@@ -7,17 +8,31 @@ values = [['Rohan', 455], ['Elvish', 250], ['Deepak', 495],
 
 # creating a pandas dataframe
 df = pd.DataFrame(values, columns=['name', 'total_marks'])
+df.loc[6] = ['Deepak', 300]
+df.loc[7] = ['Laco', 1000]
+df.loc[8] = ['Laco', 1000]
+df.loc[9] = ['Laco', 1000]
 
 # Applying lambda function to find
 # percentage of 'Total_Marks' column
 # using df.assign()
 # df = df.assign(Percentage=lambda x: (x['Total_Marks'] / 500 * 100))
 df['percentage'] = df['total_marks'] / 500 * 100
+
+grouped_object = df.groupby('name').percentage.agg([np.mean, np.median, np.std])
+grouped_object
+
+
 # %% AXES
 nums = df[['percentage', 'total_marks']]
 
 nums.sum(axis=0) # forcycle iterate along axis 0 and sum, => COLUMNWISE = 2 column result
 nums.sum(axis=1) # forcycle iterate along axis 1 and sum, => ROWWISE = row_num result
+
+
+# %% 
+print("laco melisko")
+
 
 
 # %% LAMBDA

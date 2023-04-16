@@ -15,7 +15,7 @@ from energy_neural.nns import Optimization
 
 torch.manual_seed(0)
 np.random.seed(0)
-
+plt.ioff()
 
 def plot_dataset(df, title):
     data = []
@@ -45,7 +45,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # device = "cpu"
 print(f"{device}" " is available.")
 # %%
-df = pd.read_csv('data/PJME_hourly.csv')
+df = pd.read_csv('energy_neural/data/PJME_hourly.csv')
 
 df = df.set_index(['Datetime'])
 df = df.rename(columns={'PJME_MW': 'value'})
@@ -333,7 +333,7 @@ def build_baseline_model(df, test_ratio, target_col):
     return result
 
 df_baseline = build_baseline_model(df_timelags, 0.2, 'value')
-baseline_metrics = calculate_metrics(df_timelags)
+baseline_metrics = calculate_metrics(df_baseline)
 
 import plotly.offline as pyo
 

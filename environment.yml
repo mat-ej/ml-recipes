@@ -11,7 +11,6 @@ dependencies:
   - _openmp_mutex=5.1
   - argon2-cffi=21.3.0
   - argon2-cffi-bindings=21.2.0
-#  - arrow-cpp=4.0.1
   - asttokens=2.0.5
   - attrs=21.4.0
   - aws-c-common=0.4.57
@@ -19,19 +18,23 @@ dependencies:
   - aws-checksums=0.1.9
   - aws-sdk-cpp=1.8.185
   - backcall=0.2.0
+  - backports=1.0
+  - backports.functools_lru_cache=1.6.4
   - beautifulsoup4=4.11.1
   - blas=1.0
   - bleach=4.1.0
   - boost-cpp=1.73.0
   - bottleneck=1.3.4
   - brotli=1.0.9
+  - brotli-bin=1.0.9
   - brotlipy=0.7.0
   - bzip2=1.0.8
   - c-ares=1.18.1
-  - ca-certificates=2022.4.26
-  - certifi=2022.6.15
+  - ca-certificates=2022.12.7
+  - certifi=2022.12.7
   - cffi=1.15.0
   - charset-normalizer=2.0.4
+  - colorama=0.4.6
   - cryptography=37.0.1
   - cudatoolkit=11.3.1
   - cvxpy=1.2.1
@@ -48,9 +51,11 @@ dependencies:
   - expat=2.4.4
   - fastparquet=0.5.0
   - ffmpeg=4.2.2
+  - flit-core=3.8.0
   - fontconfig=2.13.1
   - fonttools=4.25.0
   - freetype=2.11.0
+  - gettext=0.19.8.1
   - gflags=2.2.2
   - giflib=5.2.1
   - glib=2.69.1
@@ -64,6 +69,8 @@ dependencies:
   - gstreamer=1.14.0
   - icu=58.2
   - idna=3.3
+  - importlib-metadata=6.3.0
+  - importlib_resources=5.12.0
   - intel-openmp=2021.4.0
   - ipykernel=6.9.1
   - ipython=8.3.0
@@ -80,6 +87,7 @@ dependencies:
   - jupyter_core=4.10.0
   - jupyterlab_pygments=0.1.2
   - jupyterlab_widgets=1.0.0
+  - keyutils=1.6.1
   - kiwisolver=1.4.2
   - krb5=1.19.2
   - lame=3.100
@@ -87,6 +95,10 @@ dependencies:
   - ld_impl_linux-64=2.38
   - libblas=3.9.0
   - libboost=1.73.0
+  - libbrotlicommon=1.0.9
+  - libbrotlidec=1.0.9
+  - libbrotlienc=1.0.9
+  - libcblas=3.9.0
   - libcurl=7.82.0
   - libedit=3.1.20210910
   - libev=4.33
@@ -151,6 +163,7 @@ dependencies:
   - osqp=0.6.2.post0
   - packaging=21.3
   - pandas=1.4.2
+  - pandoc=2.19.2
   - pandocfilters=1.5.0
   - parso=0.8.3
   - patsy=0.5.2
@@ -165,7 +178,6 @@ dependencies:
   - prompt_toolkit=3.0.20
   - ptyprocess=0.7.0
   - pure_eval=0.2.2
-#  - pyarrow=4.0.1
   - pycparser=2.21
   - pyg=2.0.4
   - pygments=2.11.2
@@ -191,6 +203,7 @@ dependencies:
   - qdldl-python=0.1.5
   - qt=5.9.7
   - qtconsole=5.3.0
+  - qtconsole-base=5.3.0
   - qtpy=2.0.1
   - re2=2022.04.01
   - readline=8.1.2
@@ -199,6 +212,7 @@ dependencies:
   - scipy=1.7.3
   - scs=3.2.0
   - seaborn=0.11.2
+  - seaborn-base=0.11.2
   - send2trash=1.8.0
   - setuptools=61.2.0
   - sip=4.19.13
@@ -236,44 +250,14 @@ dependencies:
   - yacs=0.1.6
   - yaml=0.2.5
   - zeromq=4.3.4
+  - zipp=3.15.0
   - zlib=1.2.12
   - zstd=1.4.9
-#  - pip:
-#    - astunparse==1.6.3
-#    - cachetools==5.2.0
-#    - convertdate==2.4.0
-#    - flatbuffers==1.12
-#    - gast==0.4.0
-#    - google-auth==2.8.0
-#    - google-auth-oauthlib==0.4.6
-#    - google-pasta==0.2.0
-#    - grpcio==1.46.3
-#    - h5py==3.7.0
-#    - hijri-converter==2.2.4
-#    - holidays==0.14.2
-#    - importlib-metadata==4.11.4
-#    - kaleido==0.2.1
-#    - keras==2.9.0
-#    - keras-preprocessing==1.1.2
-#    - korean-lunar-calendar==0.2.1
-#    - libclang==14.0.1
-#    - markdown==3.3.7
-#    - oauthlib==3.2.0
-#    - protobuf==3.19.4
-#    - pyasn1==0.4.8
-#    - pyasn1-modules==0.2.8
-#    - pymeeus==0.5.11
-#    - pytorch-tabnet==3.1.1
-#    - requests-oauthlib==1.3.1
-#    - rsa==4.8
-#    - tensorboard==2.9.1
-#    - tensorboard-data-server==0.6.1
-#    - tensorboard-plugin-wit==1.8.1
-#    - tensorflow==2.9.1
-#    - tensorflow-estimator==2.9.0
-#    - tensorflow-io-gcs-filesystem==0.26.0
-#    - termcolor==1.1.0
-#    - werkzeug==2.1.2
-#    - wrapt==1.14.1
-#    - zipp==3.8.0
+  - pip:
+      - convertdate==2.4.0
+      - empiricaldist==0.6.8
+      - hijri-converter==2.2.4
+      - holidays==0.22
+      - korean-lunar-calendar==0.3.1
+      - pymeeus==0.5.12
 prefix: /home/m/miniconda3/envs/ml-recipes

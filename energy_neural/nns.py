@@ -47,7 +47,7 @@ class Optimization:
             n_features (int): Number of feature columns
 
         """
-        model_path = f'models/{self.model}_{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+        model_path = f'energy_neural/_models/{self.model}_{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
 
 
         for epoch in range(1, n_epochs + 1):
