@@ -1,11 +1,5 @@
 # ml-recipes
 
-## Conda
-conda create --name fftrees-py35 python=3.5
-
-conda env export -n fftrees-py35 -f fftrees-py35.yml --no-builds
-
-
 ## Other
     jupyter nbconvert lgbm-baseline.ipynb --to python
 
@@ -14,3 +8,12 @@ remove added files from commit
 
     git reset <file>
 
+
+## Jupyter lab installation with R
+    
+    pip install 'python-lsp-server[all]'
+    conda install jupyterlab
+    pip install jupyterlab
+    R -e 'install.packages("languageserver")'
+    R -e "install.packages("IRkernel")'
+    IRkernel::installspec

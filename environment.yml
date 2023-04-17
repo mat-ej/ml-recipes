@@ -18,7 +18,7 @@ dependencies:
   - aws-checksums=0.1.9
   - aws-sdk-cpp=1.8.185
   - backcall=0.2.0
-  - backports=1.0
+  - backports=1.1
   - backports.functools_lru_cache=1.6.4
   - beautifulsoup4=4.11.1
   - blas=1.0
@@ -30,7 +30,7 @@ dependencies:
   - brotlipy=0.7.0
   - bzip2=1.0.8
   - c-ares=1.18.1
-  - ca-certificates=2022.12.7
+  - ca-certificates=2023.01.10
   - certifi=2022.12.7
   - cffi=1.15.0
   - charset-normalizer=2.0.4
@@ -55,7 +55,7 @@ dependencies:
   - fontconfig=2.13.1
   - fonttools=4.25.0
   - freetype=2.11.0
-  - gettext=0.19.8.1
+  - gettext=0.21.0
   - gflags=2.2.2
   - giflib=5.2.1
   - glib=2.69.1
@@ -69,8 +69,8 @@ dependencies:
   - gstreamer=1.14.0
   - icu=58.2
   - idna=3.3
-  - importlib-metadata=6.3.0
-  - importlib_resources=5.12.0
+  - importlib-metadata=6.0.0
+  - importlib_resources=5.2.0
   - intel-openmp=2021.4.0
   - ipykernel=6.9.1
   - ipython=8.3.0
@@ -80,12 +80,12 @@ dependencies:
   - jinja2=3.0.3
   - joblib=1.1.0
   - jpeg=9e
-  - jsonschema=4.4.0
   - jupyter=1.0.0
-  - jupyter_client=7.2.2
   - jupyter_console=6.4.3
-  - jupyter_core=4.10.0
+  - jupyter_server=1.23.4
+  - jupyterlab=3.5.3
   - jupyterlab_pygments=0.1.2
+  - jupyterlab_server=2.10.3
   - jupyterlab_widgets=1.0.0
   - keyutils=1.6.1
   - kiwisolver=1.4.2
@@ -104,6 +104,7 @@ dependencies:
   - libev=4.33
   - libevent=2.1.12
   - libffi=3.3
+  - libgcc=7.2.0
   - libgcc-ng=11.2.0
   - libgfortran-ng=7.5.0
   - libgfortran4=7.5.0
@@ -152,18 +153,19 @@ dependencies:
   - nest-asyncio=1.5.5
   - nettle=3.7.3
   - networkx=2.6.3
+  - nodejs=6.13.1
   - notebook=6.4.11
+  - notebook-shim=0.2.2
   - numba=0.55.1
   - numexpr=2.8.1
   - numpy=1.21.5
   - numpy-base=1.21.5
   - openh264=2.1.1
-  - openssl=1.1.1o
+  - openssl=1.1.1t
   - orc=1.6.7
   - osqp=0.6.2.post0
-  - packaging=21.3
   - pandas=1.4.2
-  - pandoc=2.19.2
+  - pandoc=2.12
   - pandocfilters=1.5.0
   - parso=0.8.3
   - patsy=0.5.2
@@ -199,7 +201,6 @@ dependencies:
   - pytorch-spline-conv=1.2.1
   - pytz=2022.1
   - pyyaml=6.0
-  - pyzmq=22.3.0
   - qdldl-python=0.1.5
   - qt=5.9.7
   - qtconsole=5.3.0
@@ -207,7 +208,6 @@ dependencies:
   - qtpy=2.0.1
   - re2=2022.04.01
   - readline=8.1.2
-  - requests=2.27.1
   - scikit-learn=1.0.2
   - scipy=1.7.3
   - scs=3.2.0
@@ -230,11 +230,10 @@ dependencies:
   - threadpoolctl=2.2.0
   - thrift=0.11.0
   - tk=8.6.12
+  - tomli=2.0.1
   - torchaudio=0.11.0
   - torchvision=0.12.0
-  - tornado=6.1
   - tqdm=4.64.0
-  - traitlets=5.1.1
   - typing-extensions=4.1.1
   - typing_extensions=4.1.1
   - tzdata=2022a
@@ -250,14 +249,77 @@ dependencies:
   - yacs=0.1.6
   - yaml=0.2.5
   - zeromq=4.3.4
-  - zipp=3.15.0
+  - zipp=3.11.0
   - zlib=1.2.12
   - zstd=1.4.9
   - pip:
+      - aiofiles==22.1.0
+      - aiosqlite==0.19.0
+      - anyio==3.6.2
+      - arrow==1.2.3
+      - astroid==2.15.2
+      - autopep8==2.0.2
+      - babel==2.12.1
       - convertdate==2.4.0
+      - dill==0.3.6
+      - docstring-to-markdown==0.12
       - empiricaldist==0.6.8
+      - fasttrees==1.2.5
+      - flake8==6.0.0
+      - fqdn==1.5.1
       - hijri-converter==2.2.4
       - holidays==0.22
+      - isoduration==20.11.0
+      - isort==5.12.0
+      - json5==0.9.11
+      - jsonpointer==2.3
+      - jsonschema==4.17.3
+      - jupyter-client==7.4.9
+      - jupyter-core==5.3.0
+      - jupyter-events==0.6.3
+      - jupyter-lsp==2.0.1
+      - jupyter-server==2.5.0
+      - jupyter-server-fileid==0.9.0
+      - jupyter-server-terminals==0.4.4
+      - jupyter-server-ydoc==0.8.0
+      - jupyter-ydoc==0.2.4
+      - jupyterlab-lsp==4.0.1
+      - jupyterlab-server==2.22.1
       - korean-lunar-calendar==0.3.1
+      - lazy-object-proxy==1.9.0
+      - mccabe==0.7.0
+      - nbclassic==0.5.5
+      - packaging==23.1
+      - platformdirs==3.2.0
+      - pluggy==1.0.0
+      - pycodestyle==2.10.0
+      - pydocstyle==6.3.0
+      - pyflakes==3.0.1
+      - pylint==2.17.2
       - pymeeus==0.5.12
+      - python-json-logger==2.0.7
+      - python-lsp-jsonrpc==1.0.0
+      - python-lsp-server==1.7.2
+      - pytoolconfig==1.2.5
+      - pyzmq==25.0.2
+      - requests==2.28.2
+      - rfc3339-validator==0.1.4
+      - rfc3986-validator==0.1.1
+      - rope==1.7.0
+      - sklearn==0.0.post4
+      - sniffio==1.3.0
+      - snowballstemmer==2.2.0
+      - toml==0.10.2
+      - tomlkit==0.11.7
+      - tornado==6.2
+      - traitlets==5.9.0
+      - ujson==5.7.0
+      - uri-template==1.2.0
+      - webcolors==1.13
+      - websocket-client==1.5.1
+      - whatthepatch==1.0.4
+      - wrapt==1.15.0
+      - y-py==0.5.9
+      - yapf==0.32.0
+      - ypy-websocket==0.8.2
 prefix: /home/m/miniconda3/envs/ml-recipes
